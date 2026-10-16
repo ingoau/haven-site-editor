@@ -36,10 +36,14 @@
             class="w-[120%] max-w-none"
           />
           <h1
-            class="pointer-events-auto m-0 font-display text-[clamp(1rem,8vw,10rem)] leading-[clamp(1rem,6vw,8rem)] text-white translate-y-[75%] translate-x-[-10%] sm:text-hero sm:leading-[clamp(1rem,4vw,8rem)]"
-            title="Your event's name comes from Airtable; this one is only for the preview"
-            {@attach text(["$eventName"], title, { placeholder: "City" })}
-          ></h1>
+            class="m-0 font-display text-[clamp(1rem,8vw,10rem)] leading-[clamp(1rem,6vw,8rem)] text-white translate-y-[75%] translate-x-[-10%] sm:text-hero sm:leading-[clamp(1rem,4vw,8rem)]"
+          >
+            <span
+              class="pointer-events-auto"
+              title="Your event's name comes from Airtable; this one is only for the preview"
+              {@attach text(["$eventName"], title, { placeholder: "City" })}
+            ></span>
+          </h1>
         </div>
 
         <div

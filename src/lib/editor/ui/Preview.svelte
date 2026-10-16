@@ -103,7 +103,7 @@
       bind:this={frame}
       src="{base}/preview"
       title="Preview of your Haven page"
-      style="width: {width}px; height: {height}px; transform: scale({scale})"
+      style="width: {width}px; height: {height}px; zoom: {scale}"
     ></iframe>
   </div>
   <span class="scale-note">{width}px wide, shown at {Math.round(scale * 100)}%</span>

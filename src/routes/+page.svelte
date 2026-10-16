@@ -1,7 +1,7 @@
 <script lang="ts">
   import "$lib/editor/ui/editor.css";
   import { base } from "$app/paths";
-  import { onMount } from "svelte";
+  import { onMount, untrack } from "svelte";
   import { editor } from "$lib/editor/store.svelte";
   import { exportJson, importFile, toast, copyJson } from "$lib/editor/actions.svelte";
   import { FORM_URL, keysFor, sectionFor, sections, type SectionId } from "$lib/editor/sections";
@@ -36,7 +36,9 @@
     const sel = editor.selected;
     if (!sel) return;
     const target = sectionFor(sel);
-    if (target !== section && section !== "json") section = target;
+    untrack(() => {
+      if (target !== section && section !== "json") section = target;
+    });
     requestAnimationFrame(() => {
       if (!formEl) return;
       for (let n = sel.length; n > 0; n--) {

@@ -90,7 +90,8 @@
   display: none !important;
 }
 
-.ed-tools button {
+.ed-tools button,
+.ed-tools .ed-grip {
   display: grid;
   place-items: center;
   width: 24px;

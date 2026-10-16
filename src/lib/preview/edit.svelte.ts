@@ -143,8 +143,8 @@ export function item(list: Path, index: number, opts: ItemOptions): Attachment<H
     const name = document.createElement("span");
     name.className = "ed-tools-name";
     name.textContent = opts.label ?? "";
-    const grip = document.createElement("button");
-    grip.type = "button";
+    // A span, not a button: Firefox won't start a drag from a button.
+    const grip = document.createElement("span");
     grip.className = "ed-grip";
     grip.title = "Drag to reorder";
     grip.setAttribute("aria-label", `Drag ${opts.label ?? "item"} to reorder`);

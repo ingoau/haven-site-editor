@@ -95,12 +95,17 @@
         ondrop={drop}
       >
         <div class="row-head">
-          <button
-            type="button"
+          <span
+            role="button"
+            tabindex="0"
             class="grip"
             draggable="true"
+            onkeydown={(e) => {
+              if (e.key === "ArrowUp" && i > 0) { e.preventDefault(); editor.move(path, i, path, i - 1); }
+              if (e.key === "ArrowDown" && i < items.length - 1) { e.preventDefault(); editor.move(path, i, path, i + 2); }
+            }}
             aria-label="Drag {noun} {i + 1} to reorder"
-            title="Drag to reorder"
+            title="Drag, or use the arrow keys, to reorder"
             ondragstart={(e) => {
               dragging = { list: path, index: i, kind: dragGroup };
               e.dataTransfer?.setData("text/plain", String(i));
@@ -114,7 +119,7 @@
             }}
           >
             <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor" aria-hidden="true"><circle cx="5" cy="3" r="1.4" /><circle cx="11" cy="3" r="1.4" /><circle cx="5" cy="8" r="1.4" /><circle cx="11" cy="8" r="1.4" /><circle cx="5" cy="13" r="1.4" /><circle cx="11" cy="13" r="1.4" /></svg>
-          </button>
+          </span>
           <button
             type="button"
             class="row-title"

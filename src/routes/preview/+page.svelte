@@ -61,9 +61,11 @@
       preview.showHidden = msg.showHidden;
       preview.ready = true;
     } else if (msg?.type === "scroll") {
-      document
-        .querySelector(`[data-section="${msg.target}"]`)
-        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      // Some sections are `display: contents` on wide screens and have no box
+      // of their own; scroll to the first thing inside them that does.
+      let el = document.querySelector<Element>(`[data-section="${msg.target}"]`);
+      while (el && el.getClientRects().length === 0) el = el.firstElementChild;
+      el?.scrollIntoView({ behavior: "smooth", block: "start" });
     } else if (msg?.type === "reveal") {
       for (let n = msg.path.length; n > 0; n--) {
         const key = msg.path.slice(0, n).join(".");
