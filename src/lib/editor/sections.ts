@@ -46,3 +46,4 @@ export function keysFor(id: SectionId): string[] {
 
 export const FORM_URL = "https://forms.hackclub.com/haven-website";
 export const DOCS_URL = "https://github.com/hackclub/haven/blob/main/SITE_DATA.md";
+export const REPO_URL = "https://github.com/ingoau/haven-site-editor";

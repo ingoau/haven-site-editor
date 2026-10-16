@@ -3,6 +3,11 @@
   "private": true,
   "type": "module",
   "version": "0.1.0",
+  "license": "AGPL-3.0-only",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ingoau/haven-site-editor"
+  },
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",

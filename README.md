@@ -65,3 +65,15 @@ Pushing to `main` deploys to GitHub Pages through
 `.github/workflows/deploy.yml`, built under `/<repo-name>`. Pages has to be
 switched on once under Settings → Pages → Source: GitHub Actions; the workflow
 can't do that itself.
+
+## License
+
+The editor is free software under the
+[GNU Affero General Public License v3.0](LICENSE). If you run a modified
+version for other people to use, you have to offer them its source.
+
+The page sections, copy and artwork copied from
+[hackclub/haven](https://github.com/hackclub/haven) (`src/lib/haven/`,
+`src/lib/data/` and `static/images/`) belong to Hack Club. They are
+included to make the preview match the real site, and this license does not
+cover them.

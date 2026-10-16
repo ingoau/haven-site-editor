@@ -312,6 +312,40 @@ body {
   justify-items: start;
 }
 
+.source {
+  margin: 10px 0 0;
+  color: var(--ink-2);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.source a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Not a section link, so none of the rail's button styling. */
+.rail .rail-foot .link-button {
+  width: auto;
+  padding: 0;
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 13px;
+}
+
+.source a:hover {
+  color: var(--ink);
+}
+
+a.tool {
+  color: #c9cf9f;
+}
+
+a.tool:hover {
+  color: #f3f5df;
+}
+
 .saved {
   margin: 0;
   color: var(--ink-2);
