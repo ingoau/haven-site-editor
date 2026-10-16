@@ -64,6 +64,17 @@
       document
         .querySelector(`[data-section="${msg.target}"]`)
         ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else if (msg?.type === "reveal") {
+      for (let n = msg.path.length; n > 0; n--) {
+        const key = msg.path.slice(0, n).join(".");
+        const el = document.querySelector<HTMLElement>(`[data-path="${CSS.escape(key)}"]`);
+        if (!el) continue;
+        const rect = el.getBoundingClientRect();
+        if (rect.bottom < 0 || rect.top > innerHeight) {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+        break;
+      }
     }
   }
 

@@ -44,6 +44,7 @@ export function text(path: Path, value: string, opts: TextOptions = {}): Attachm
     node.contentEditable = "plaintext-only";
     if (node.contentEditable !== "plaintext-only") node.contentEditable = "true";
     node.dataset.editable = "";
+    node.dataset.path = pathKey(path);
     node.dataset.placeholder = opts.placeholder ?? "Type here";
     node.spellcheck = true;
     if (document.activeElement !== node && node.textContent !== value) node.textContent = value;
@@ -90,6 +91,7 @@ export function text(path: Path, value: string, opts: TextOptions = {}): Attachm
 export function pick(path: Path, label?: string): Attachment<HTMLElement> {
   return (node) => {
     node.dataset.pick = label ?? "";
+    node.dataset.path = pathKey(path);
     node.classList.toggle("ed-selected", isSelected(path));
     const onClick = (e: MouseEvent) => {
       if ((e.target as HTMLElement).closest("[data-ed-tools]")) return;

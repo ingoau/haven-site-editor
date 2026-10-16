@@ -10,7 +10,9 @@ export type ToPreview =
       openFaq: boolean;
       showHidden: boolean;
     }
-  | { type: "scroll"; target: string };
+  | { type: "scroll"; target: string }
+  /** Bring the element for `path` (or its nearest ancestor) into view. */
+  | { type: "reveal"; path: Path };
 
 /** Preview frame → editor. */
 export type FromPreview =
