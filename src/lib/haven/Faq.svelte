@@ -1,31 +1,35 @@
 <script lang="ts">
-  import { defaultSiteData } from "$lib/data/site";
   import type { SiteImages } from "$lib/data/images";
   import type { FaqItem } from "$lib/data/types";
+  import { pathKey } from "$lib/editor/doc";
+  import AddChip from "$lib/preview/AddChip.svelte";
+  import Segments from "$lib/preview/Segments.svelte";
+  import { item, preview, text } from "$lib/preview/edit.svelte";
 
   interface Props {
-    heading?: string;
-    items?: FaqItem[];
+    heading: string;
+    items: FaqItem[];
     /** Label on the button that jumps back to the signup box. */
-    cta?: string;
-    images?: SiteImages;
+    cta: string;
+    images: SiteImages;
   }
 
-  let {
-    heading = defaultSiteData.faq.heading,
-    items = defaultSiteData.faq.items,
-    cta = defaultSiteData.faq.cta,
-    images = defaultSiteData.images,
-  }: Props = $props();
+  let { heading, items, cta, images }: Props = $props();
 
+  // Questions alternate between the columns; keep each one's real index.
   const columns = $derived([
-    items.filter((_, i) => i % 2 === 0),
-    items.filter((_, i) => i % 2 === 1),
+    items.map((q, i) => ({ q, i })).filter(({ i }) => i % 2 === 0),
+    items.map((q, i) => ({ q, i })).filter(({ i }) => i % 2 === 1),
   ]);
+
+  const isOpen = (i: number) =>
+    preview.openFaq ||
+    (!!preview.selected && pathKey(preview.selected).startsWith(`faq.items.${i}`));
 </script>
 
 <section
   id="faq"
+  data-section="faq"
   class="relative pb-0 pt-[clamp(3.5rem,11vw,7.875rem)] md:pt-[clamp(2rem,6vw,15rem)] md:pb-[clamp(2rem,6vw,15rem)]"
 >
   <img
@@ -93,9 +97,8 @@
     />
     <h2
       class="relative z-15 text-center font-display text-[clamp(3.5rem,8vw,10rem)] leading-[0.8] tracking-tighter text-white text-shadow-[0_0_10px_var(--color-haven-blue-deep)]"
-    >
-      {heading}
-    </h2>
+      {@attach text(["faq", "heading"], heading, { placeholder: "FAQ" })}
+    ></h2>
 
     <div
       class="relative z-10 mt-[clamp(3rem,18vw,15rem)] grid grid-cols-1 items-start mx-[clamp(1rem,10vw,8rem)] gap-x-[clamp(1rem,2vw,1.75rem)] md:px-[clamp(1rem,5vw,6rem)] md:mx-auto md:w-[100%] md:grid-cols-2 md:gap-x-[2%] md:items-stretch"
@@ -115,19 +118,23 @@
               class="absolute left-1/2 top-0 -translate-x-[48%] w-[92%] h-auto object-cover object-top"
             />
           </div>
-          {#each column as item, i (i)}
+          {#each column as { q: faq, i: index }, i (index)}
             <li
               class="relative overflow-hidden"
               style="z-index: {column.length - i}"
+              {@attach item(["faq", "items"], index, { kind: "faq", label: "Question" })}
             >
               <details
-                name="faq-accordion"
+                open={isOpen(index)}
                 class="group relative z-10 rounded-[1.25rem] md:rounded-[1.4cqw]"
               >
                 <summary
                   class="relative z-10 flex cursor-pointer list-none items-center justify-between gap-4 px-[clamp(2rem,12vw,12rem)] pt-[clamp(1rem,2vw,5rem)] pb-[clamp(1rem,12vw,12rem)] font-display text-[clamp(1.125rem,1.9vw,1.875rem)] leading-[0.9] tracking-[-0.05em] text-white group-open:pb-2.5 sm:px-[clamp(2rem,12vw,12rem)] sm:pt-[clamp(1rem,3vw,6rem)] sm:pb-[clamp(1rem,12vw,15rem)] md:px-[clamp(2rem,8vw,8rem)] md:pt-[clamp(0rem,1vw,2rem)] md:pb-[clamp(2rem,6vw,10rem)] md:leading-[1.1] md:text-[clamp(1.125rem,1.6vw,2rem)] md:group-open:pb-[0.9cqw] [&::-webkit-details-marker]:hidden"
+                  onclick={(e) => {
+                    if ((e.target as HTMLElement).closest("[data-editable]")) e.preventDefault();
+                  }}
                 >
-                  {item.q}
+                  <span class="flex-1" {@attach text(["faq", "items", index, "q"], faq.q, { placeholder: "Question" })}></span>
                   <img
                     src={images.faqChevron}
                     alt=""
@@ -137,16 +144,12 @@
                 </summary>
                 <p
                   class="relative z-10 px-[clamp(2rem,12vw,12rem)] pt-[clamp(0rem,1vw,3rem)] pb-[clamp(1rem,10vw,8rem)] font-body text-[clamp(1rem,2vw,2rem)] leading-[1.25] tracking-[-0.03em] text-white sm:px-[clamp(2rem,12vw,12rem)] md:px-[clamp(2rem,8vw,8rem)] md:pb-[clamp(1rem,8vw,10rem)] md:pt-[clamp(0.5rem,1.5vw,4rem)] md:text-[clamp(1rem,1.4vw,1.5rem)] md:leading-[1.25]"
-                >{#each item.a as seg}{#if seg.href}<a
-                        href={seg.href}
-                        class="underline decoration-from-font underline-offset-2 hover:text-haven-orange-mid"
-                        target={seg.href.startsWith("http")
-                          ? "_blank"
-                          : undefined}
-                        rel={seg.href.startsWith("http")
-                          ? "noopener"
-                          : undefined}>{seg.text}</a
-                      >{:else}{seg.text}{/if}{/each}</p>
+                ><Segments
+                    path={["faq", "items", index, "a"]}
+                    segments={faq.a}
+                    linkClass="underline decoration-from-font underline-offset-2"
+                    select={["faq", "items", index]}
+                  /></p>
               </details>
 
               <img
@@ -166,6 +169,9 @@
         </ul>
       {/each}
     </div>
+    <div class="ed-only relative z-20 mt-6 flex justify-center">
+      <AddChip list={["faq", "items"]} kind="faq" label="Add a question" length={items.length} class="ed-add-light" />
+    </div>
 
     <div
       class="relative flex items-center justify-center mx-auto gap-[clamp(1rem,4vw,5rem)]"
@@ -177,12 +183,10 @@
         class="relative scale-x-[-1] pointer-events-none z-20 w-[18%] md:w-[10%] h-auto"
       />
 
-      <a
-        href="#top"
+      <span
         class="relative translate-y-[80%] z-20 py-[clamp(1rem,3vw,5rem)] mt-[clamp(2rem,4vw,8rem)] mb-[clamp(4rem,24vw,20rem)] block w-[50%] rounded-[1.875rem] bg-haven-green-deep shadow-[0_0_10px_var(--color-haven-green-deep)] px-6 text-center font-display text-[clamp(1.5rem,4vw,2.5rem)] leading-none tracking-[-0.03em] text-white transition-transform hover:scale-[1.02] active:scale-100 md:mb-[clamp(4rem,14vw,6rem)] md:mt-[clamp(1rem,5vw,4rem)] md:w-[25%] md:max-w-none md:rounded-[2.1cqw] md:py-[1.5cqw] md:text-[clamp(1.5rem,3vw,2.5rem)]"
-      >
-        {cta}
-      </a>
+        {@attach text(["faq", "cta"], cta, { placeholder: "Button" })}
+      ></span>
 
       <img
         src={images.faqArrow}

@@ -3,22 +3,22 @@
   // reword the paragraphs and the link labels, and swap the artwork, but not
   // where the links go.
   import { footerLinks } from "$lib/data/content";
-  import { defaultSiteData } from "$lib/data/site";
   import type { SiteImages } from "$lib/data/images";
   import type { SiteData } from "$lib/data/types";
+  import AddChip from "$lib/preview/AddChip.svelte";
+  import Segments from "$lib/preview/Segments.svelte";
+  import { item, text } from "$lib/preview/edit.svelte";
 
   interface Props {
-    images?: SiteImages;
-    footer?: SiteData["footer"];
+    images: SiteImages;
+    footer: SiteData["footer"];
   }
 
-  let {
-    images = defaultSiteData.images,
-    footer = defaultSiteData.footer,
-  }: Props = $props();
+  let { images, footer }: Props = $props();
 </script>
 
 <footer
+  data-section="footer"
   class="relative pb-[clamp(2.5rem,5vw,4rem)] pt-[clamp(2rem,6vw,3rem)] text-white px-[clamp(1rem,4vw,5rem)] md:px-[clamp(3rem,8vw,8rem)]"
 >
   <img
@@ -47,9 +47,8 @@
               <a
                 href={link.href}
                 class="font-display text-[clamp(0.75rem,3vw,1.5em)] leading-1 tracking-[-0.05em] transition-colors hover:text-haven-yellow"
-              >
-                {footer.links[link.key]}
-              </a>
+                {@attach text(["footer", "links", link.key], footer.links[link.key], { placeholder: link.label })}
+              ></a>
             </li>
           {/each}
         </ul>
@@ -60,15 +59,14 @@
       class="flex flex-col gap-4 font-body text-[clamp(0.5rem,1.65vw,1rem)] leading-[1.4] md:pt-[clamp(1rem,3vw,2rem)]"
     >
       {#each footer.body as paragraph, i (i)}
-        <p>{#each paragraph as seg}{#if seg.href}<a
-                class="underline decoration-from-font underline-offset-2 hover:text-haven-yellow"
-                href={seg.href}
-                target={seg.href.startsWith("http") ? "_blank" : undefined}
-                rel={seg.href.startsWith("http")
-                  ? "noopener"
-                  : undefined}>{seg.text}</a
-              >{:else}{seg.text}{/if}{/each}</p>
+        <p {@attach item(["footer", "body"], i, { kind: "paragraph", label: "Paragraph", tools: "outside" })}><Segments
+            path={["footer", "body", i]}
+            segments={paragraph}
+            linkClass="underline decoration-from-font underline-offset-2"
+            select={["footer", "body", i]}
+          /></p>
       {/each}
+      <AddChip list={["footer", "body"]} kind="paragraph" label="Add paragraph" length={footer.body.length} class="ed-add-light self-start" />
     </div>
   </div>
 </footer>

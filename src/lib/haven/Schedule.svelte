@@ -1,28 +1,29 @@
 <script lang="ts">
-  import { defaultSiteData } from "$lib/data/site";
   import type { SiteImages } from "$lib/data/images";
   import type { ScheduleDay } from "$lib/data/types";
+  import { pathKey, type Path } from "$lib/editor/doc";
+  import AddChip from "$lib/preview/AddChip.svelte";
+  import { item, pick, preview, text } from "$lib/preview/edit.svelte";
 
   interface Props {
-    heading?: string;
-    days?: ScheduleDay[];
+    heading: string;
+    days: ScheduleDay[];
     /** Shown in place of the timetable until there are any days with items. */
-    tbd?: { title: string; body: string };
-    images?: SiteImages;
+    tbd: { title: string; body: string };
+    images: SiteImages;
   }
 
-  let {
-    heading = defaultSiteData.schedule.heading,
-    days = defaultSiteData.schedule.days,
-    tbd = defaultSiteData.schedule.tbd,
-    images = defaultSiteData.images,
-  }: Props = $props();
+  let { heading, days, tbd, images }: Props = $props();
+
+  const isSelected = (path: Path) =>
+    !!preview.selected && pathKey(preview.selected).startsWith(pathKey(path));
 
   const filled = $derived(days.filter((day) => day.items.length > 0));
 </script>
 
 <section
   id="schedule"
+  data-section="schedule"
   class="relative z-10 bg-haven-green mt-[clamp(2.5rem,10vw,15rem)] mb-[clamp(1rem,5vw,8rem)] py-[clamp(1rem,3vw,4rem)]"
 >
   <img
@@ -94,9 +95,8 @@
   >
     <h2
       class="relative text-center z-15 font-display text-[clamp(1.75rem,5vw,4rem)] leading-[clamp(1.5rem,1.5vw,1.75rem)] tracking-[-0.05em] text-white"
-    >
-      {heading}
-    </h2>
+      {@attach text(["schedule", "heading"], heading, { placeholder: "Heading" })}
+    ></h2>
     <img
       src={images.schedulePlantLeft}
       alt=""
@@ -109,7 +109,7 @@
       aria-hidden="true"
       class="absolute z-10 top-0 -translate-y-[45%] right-[clamp(2.3rem,9vw,6rem)] w-[26%] object-cover block sm:w-[32%] sm:right-[clamp(3rem,8vw,6rem)] md:hidden"
     />
-    {#if filled.length > 0}
+    {#if days.length > 0}
       <div
         class={[
           "mx-auto px-[clamp(1rem,6vw,8rem)] mt-[clamp(1rem,3.5vw,3rem)] grid grid-cols-1 gap-[clamp(0.5rem,2vw,1.75rem)] md:px-[clamp(2rem,6vw,8rem)]",
@@ -118,53 +118,74 @@
           filled.length > 1 && "2xl:grid-cols-2",
         ]}
       >
-        {#each filled as day, dayIndex (dayIndex)}
+        {#each days as day, dayIndex (dayIndex)}
           <section
-            class="panel px-[clamp(0.2rem,2.4vw,2.25rem)] py-[clamp(1rem,2.2vw,2rem)] bg-haven-brown-light"
+            class={[
+              "panel px-[clamp(0.2rem,2.4vw,2.25rem)] py-[clamp(1rem,2.2vw,2rem)] bg-haven-brown-light",
+              day.items.length === 0 && "ed-hidden-on-site",
+            ]}
+            data-hidden-note="Hidden until it has items"
+            {@attach item(["schedule", "days"], dayIndex, { kind: "day", label: "Day" })}
           >
-            <h3 class="font-display text-heading text-haven-butter">
-              {day.day}
-            </h3>
+            <h3
+              class="font-display text-heading text-haven-butter"
+              {@attach text(["schedule", "days", dayIndex, "day"], day.day, { placeholder: "Day" })}
+            ></h3>
 
             <ol
               class="mt-[clamp(0.75rem,1.6vw,1.25rem)] flex flex-col gap-[clamp(0.2rem,1vw,1.1rem)]"
             >
-              {#each day.items as item, itemIndex (itemIndex)}
-                <li class="flex gap-x-[clamp(0.5rem,2vw,2.25rem)] flex-row items-baseline">
+              {#each day.items as entry, itemIndex (itemIndex)}
+                <li
+                  class="flex gap-x-[clamp(0.5rem,2vw,2.25rem)] flex-row items-baseline"
+                  {@attach item(["schedule", "days", dayIndex, "items"], itemIndex, { kind: "scheduleItem", label: "Item", tools: "outside" })}
+                >
                   <span
                     class="w-[clamp(5rem,10vw,8rem)] font-display text-subheading whitespace-nowrap text-white shrink-0"
-                  >
-                    {item.time}
-                  </span>
+                    {@attach text(["schedule", "days", dayIndex, "items", itemIndex, "time"], entry.time, { placeholder: "Time" })}
+                  ></span>
                   <span class="flex-1">
-                    <span class="block font-display text-subheading line-height leading-none text-white">
-                      {item.title}
-                    </span>
-                    {#if item.body}
-                      <span class="mt-2 block font-body text-copy text-white">
-                        {item.body}
-                      </span>
+                    <span
+                      class="block font-display text-subheading line-height leading-none text-white"
+                      {@attach text(["schedule", "days", dayIndex, "items", itemIndex, "title"], entry.title, { placeholder: "What happens" })}
+                    ></span>
+                    {#if entry.body || isSelected(["schedule", "days", dayIndex, "items", itemIndex])}
+                      <span
+                        class="mt-2 block font-body text-copy text-white"
+                        {@attach text(["schedule", "days", dayIndex, "items", itemIndex, "body"], entry.body ?? "", { placeholder: "Optional detail" })}
+                      ></span>
                     {/if}
                   </span>
                 </li>
               {/each}
             </ol>
+            <AddChip
+              list={["schedule", "days", dayIndex, "items"]}
+              kind="scheduleItem"
+              label="Add item"
+              length={day.items.length}
+              class="ed-add-light mt-3"
+            />
           </section>
         {/each}
       </div>
     {:else}
       <p
         class="panel mx-auto mt-[clamp(1.5rem,3.5vw,3rem)] max-w-[31.5rem] px-[clamp(1.25rem,2.4vw,2.25rem)] py-[clamp(1.5rem,2.6vw,2.25rem)] text-center"
+        {@attach pick(["schedule", "tbd"], "Placeholder")}
       >
-        <span class="block font-display text-heading text-haven-orange-bright">
-          {tbd.title}
-        </span>
+        <span
+          class="block font-display text-heading text-haven-orange-bright"
+          {@attach text(["schedule", "tbd", "title"], tbd.title, { placeholder: "TBD!" })}
+        ></span>
         <span
           class="mt-[clamp(0.5rem,1vw,0.75rem)] block font-body text-copy text-haven-orange-mid"
-        >
-          {tbd.body}
-        </span>
+          {@attach text(["schedule", "tbd", "body"], tbd.body, { placeholder: "Shown until you add a schedule" })}
+        ></span>
       </p>
     {/if}
+    <div class="ed-only mt-6 flex justify-center">
+      <AddChip list={["schedule", "days"]} kind="day" label="Add a day" length={days.length} class="ed-add-light" />
+    </div>
   </div>
 </section>

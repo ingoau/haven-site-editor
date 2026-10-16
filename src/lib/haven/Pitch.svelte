@@ -1,22 +1,17 @@
 <script lang="ts">
-  import { pitchesPoc } from "$lib/data/content";
-  import { defaultSiteData } from "$lib/data/site";
   import type { SiteImages } from "$lib/data/images";
   import type { PitchItem } from "$lib/data/types";
+  import AddChip from "$lib/preview/AddChip.svelte";
+  import Segments from "$lib/preview/Segments.svelte";
+  import { item, text } from "$lib/preview/edit.svelte";
 
   interface Props {
-    poc: boolean;
-    heading?: string;
-    items?: PitchItem[];
-    images?: SiteImages;
+    heading: string;
+    items: PitchItem[];
+    images: SiteImages;
   }
 
-  let {
-    poc,
-    heading = defaultSiteData.pitch.heading,
-    items = poc ? pitchesPoc : defaultSiteData.pitch.items,
-    images = defaultSiteData.images,
-  }: Props = $props();
+  let { heading, items, images }: Props = $props();
 
   const stage: Record<string, string> = {
     triangles: "md:absolute md:left-[24.9%] md:top-[55%] md:w-[53.3%]",
@@ -49,6 +44,7 @@
 </script>
 
 <section
+  data-section="pitch"
   class="relative flex flex-col items-stretch gap-[clamp(1.5rem,3vw,2.5rem)] md:px-3 pb-[clamp(2rem,5vw,4rem)] pt-[clamp(2.5rem,6vw,5rem)] md:contents"
 >
   <img
@@ -65,9 +61,8 @@
       "glow-yellow mx-auto max-w-[14ch] text-center font-display text-display text-white md:max-w-none md:text-[4.17cqw] md:leading-[0.8]",
       stage.heading,
     ]}
-  >
-    {heading}
-  </h2>
+    {@attach text(["pitch", "heading"], heading, { placeholder: "Heading" })}
+  ></h2>
 
   <div class="flex items-center md:gap-4 pt-4 pb-8 md:contents z-20">
     <div
@@ -81,6 +76,7 @@
             BUBBLE_WIDTH,
             bubbleOffset[index],
           ]}
+          {@attach item(["pitch", "items"], index, { kind: "pitch", label: "Bubble" })}
         >
           <img
             src={images.pitchBubbleMobile}
@@ -116,13 +112,14 @@
               "relative aspect-1268/331 w-full z-10 min-h-[80%] max-w-[90%] px-[clamp(1rem,8vw,6rem)] ml-2 py-[clamp(1.1rem,4vw,2.5rem)] text-center font-body text-[clamp(0.7rem,3vw,1.2rem)] leading-[clamp(0.8rem,3.7vw,6rem)] text-haven-orange-deep md:aspect-auto md:text-[1.55cqw] md:leading-[1.3]",
               bubblePadding[index],
             ]}
-          >
-            {#each pitch.body as segment}{#if segment.mark}<span class="marker"
-                  >{segment.text}</span
-                >{:else}{segment.text}{/if}{/each}
-          </p>
+          ><Segments path={["pitch", "items", index, "body"]} segments={pitch.body} select={["pitch", "items", index]} /></p>
         </div>
       {/each}
+      {#if items.length < 3}
+        <div class="ed-only flex justify-center py-4">
+          <AddChip list={["pitch", "items"]} kind="pitch" label="Add a bubble" length={items.length} />
+        </div>
+      {/if}
     </div>
 
     <img

@@ -1,21 +1,17 @@
 <script lang="ts">
-  import { defaultSiteData } from "$lib/data/site";
   import { cssUrl, type SiteImages } from "$lib/data/images";
   import type { Perk } from "$lib/data/types";
+  import AddChip from "$lib/preview/AddChip.svelte";
+  import { asset, item, text } from "$lib/preview/edit.svelte";
 
   interface Props {
-    title?: string;
-    body?: string;
-    perks?: Perk[];
-    images?: SiteImages;
+    title: string;
+    body: string;
+    perks: Perk[];
+    images: SiteImages;
   }
 
-  let {
-    title = defaultSiteData.about.title,
-    body = defaultSiteData.about.body,
-    perks = defaultSiteData.about.perks,
-    images = defaultSiteData.images,
-  }: Props = $props();
+  let { title, body, perks, images }: Props = $props();
 
   const intro = "md:absolute md:left-[16.1%] md:top-[5.6%] md:w-[30%]";
   const daven = "md:absolute md:left-[65.8%] md:top-[5.6%] md:w-[7.5%]";
@@ -31,6 +27,7 @@
 </script>
 
 <section
+  data-section="about"
   class="relative flex flex-col gap-[clamp(2.5rem,6vw,4rem)] overflow-x-clip px-18 pb-[clamp(3rem,7vw,6rem)] pt-[max(3.5rem,14vw)] sm:px-36 md:contents"
 >
   <div
@@ -38,14 +35,12 @@
   >
     <h2
       class="font-display text-heading text-white md:text-[3cqw] md:leading-[0.8]"
-    >
-      {title}
-    </h2>
+      {@attach text(["about", "title"], title, { placeholder: "Heading" })}
+    ></h2>
     <p
       class="mt-[1em] font-body text-lead leading-[1.15] text-white md:text-[1.5cqw]"
-    >
-      {body}
-    </p>
+      {@attach text(["about", "body"], body, { placeholder: "A sentence about your jam" })}
+    ></p>
   </div>
 
   <img
@@ -64,6 +59,7 @@
         perk.side === "end" ? "self-end" : "self-start",
         stage[index],
       ]}
+      {@attach item(["about", "perks"], index, { kind: "perk", label: "Sign" })}
     >
       <div class="relative w-full aspect-1972/1413">
         <img
@@ -84,25 +80,23 @@
             class="px-2 pt-[clamp(2.5rem,8vw,7rem)] md:px-6 grid grid-cols-2 gap-[clamp(1rem,3vw,5rem)] md:pt-[15%] md:gap-[3%]"
           >
             {#each perk.photos as photo, photoIndex (photoIndex)}
-              <li>
-                <svelte:element
-                  this={photo.href ? "a" : "div"}
-                  href={photo.href}
-                  target={photo.href ? "_blank" : undefined}
-                  rel={photo.href ? "noopener" : undefined}
-                  class={["block", photo.href && "group"]}
-                >
+              <li
+                {@attach item(["about", "perks", index, "photos"], photoIndex, {
+                  kind: "photo",
+                  axis: "x",
+                  label: "Photo",
+                })}
+              >
+                <div class="block">
                   <img
-                    src={photo.src}
+                    src={asset(photo.src)}
                     alt={photo.alt}
-                    loading="lazy"
                     decoding="async"
                     class={[
-                      "w-full rounded-[clamp(0.625rem,1vw,1rem)] object-cover transition-transform md:rounded-[1cqw]",
+                      "w-full rounded-[clamp(0.625rem,1vw,1rem)] object-cover md:rounded-[1cqw]",
                       index === 0
                         ? "mt-[clamp(0.3rem,2vw,3rem)] h-[clamp(2.5rem,15vw,6rem)] md:h-[6.5cqw]"
                         : "h-[clamp(3.5rem,18vw,5rem)] md:h-[9cqw]",
-                      photo.href && "group-hover:scale-[1.03]",
                       photo.position,
                     ]}
                   />
@@ -110,13 +104,17 @@
                     <span
                       class="mt-1.5 block font-body text-[clamp(0.3rem,1.2vw,1.2rem)] leading-[clamp(0.2rem,1vw,1.5rem)] tracking-[-0.03em] text-haven-brown-light md:mt-[3%] md:text-[1cqw]"
                     >
-                      <span class="block">{photo.caption.title}</span>
-                      <span class="block text-[0.8em]">
-                        {photo.caption.author}
-                      </span>
+                      <span
+                        class="block"
+                        {@attach text(["about", "perks", index, "photos", photoIndex, "caption", "title"], photo.caption.title, { placeholder: "Game title" })}
+                      ></span>
+                      <span
+                        class="block text-[0.8em]"
+                        {@attach text(["about", "perks", index, "photos", photoIndex, "caption", "author"], photo.caption.author, { placeholder: "by…" })}
+                      ></span>
                     </span>
                   {/if}
-                </svelte:element>
+                </div>
               </li>
             {/each}
           </ul>
@@ -128,9 +126,8 @@
                   ? "text-[clamp(0.45rem,2.1vw,3rem)] mt-[clamp(0.3rem,1vw,1rem)] md:mt-[3%]"
                   : "text-[clamp(0.75rem,3vw,3rem)] mt-[clamp(0.5rem,2vw,3rem)] md:mt-[3%]",
               ]}
-            >
-              {line}
-            </p>
+              {@attach text(["about", "perks", index, "blurb", lineIndex], line, { placeholder: "A line under the photos" })}
+            ></p>
           {/each}
         </div>
 
@@ -139,11 +136,16 @@
         >
           <h3
             class="relative font-display z-10 whitespace-nowrap text-heading text-white md:text-[3.06cqw] md:leading-[0.8]"
-          >
-            {perk.title}
-          </h3>
+            {@attach text(["about", "perks", index, "title"], perk.title, { placeholder: "Sign title" })}
+          ></h3>
         </div>
       </div>
     </div>
   {/each}
+
+  {#if perks.length < 3}
+    <div class="ed-only flex justify-center md:absolute md:left-[40%] md:top-[50%]">
+      <AddChip list={["about", "perks"]} kind="perk" label="Add a sign" length={perks.length} />
+    </div>
+  {/if}
 </section>

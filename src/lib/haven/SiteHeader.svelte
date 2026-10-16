@@ -1,31 +1,17 @@
 <script lang="ts">
   // The same three links on every page, city or not; only the labels change.
   import { navLinks } from "$lib/data/content";
-  import { defaultSiteData } from "$lib/data/site";
   import type { SiteImages } from "$lib/data/images";
   import type { SiteData } from "$lib/data/types";
+  import { text } from "$lib/preview/edit.svelte";
 
   interface Props {
-    poc?: boolean;
-    images?: SiteImages;
-    nav?: SiteData["nav"];
+    images: SiteImages;
+    nav: SiteData["nav"];
   }
 
-  let {
-    poc = false,
-    images = defaultSiteData.images,
-    nav = defaultSiteData.nav,
-  }: Props = $props();
-
-  let scrolled = $state(false);
-
-  // The page can load already scrolled (a reload, or a #hash target).
-  $effect(() => {
-    scrolled = window.scrollY > 10;
-  });
+  let { images, nav }: Props = $props();
 </script>
-
-<svelte:window onscroll={() => (scrolled = window.scrollY > 10)} />
 
 <header class="absolute inset-x-0 top-0 z-30">
   <img
@@ -36,33 +22,11 @@
     height="260"
     class="pointer-events-none fixed right-0 top-0 -z-10 w-[min(41rem,max(46%,calc(13rem_+_8vw)))] max-w-none select-none md:w-[45%] md:right-[clamp(-3rem,-2vw,0rem)] md:top-[clamp(-3rem,-2vw,0rem)]"
   />
-
-  <div
-    class={[
-      "shell relative flex items-start justify-end pb-3 pt-[clamp(0.5rem,1vw,1.5rem)]",
-      poc ? "block" : "hidden",
-    ]}
-  >
-    <a
-      href="#top"
-      class="absolute left-1/2 top-[var(--logo-top)] -translate-x-1/2"
-      aria-label="Hack Club Haven — home"
-    >
-      <img
-        src={images.logo}
-        alt="Hack Club Haven"
-        width="778"
-        height="445"
-        class="w-[var(--logo-w)]"
-      />
-    </a>
-  </div>
 </header>
 
 <div
   data-nav-bar
-  data-scrolled={scrolled ? "" : undefined}
-  class="fixed inset-x-0 top-0 justify-end z-30 flex pb-3 pt-[clamp(0.5rem,1.4vw,1.5rem)] px-[clamp(1rem,4vw,4rem)] pointer-events-none transition-[background-color,backdrop-filter,box-shadow] duration-200"
+  class="fixed inset-x-0 top-0 justify-end z-30 flex pb-3 pt-[clamp(0.5rem,1.4vw,1.5rem)] px-[clamp(1rem,4vw,4rem)] pointer-events-none"
 >
   <nav class="pointer-events-auto" aria-label="Primary">
     <ul class="flex items-center gap-[clamp(1.125rem,2.2vw,2.75rem)]">
@@ -71,9 +35,8 @@
           <a
             href={link.href}
             class="inline-block py-1 font-display text-[clamp(1rem,3.5vw,8rem)] leading-none tracking-[-0.03em] text-haven-yellow transition-colors hover:text-white"
-          >
-            {nav[link.key]}
-          </a>
+            {@attach text(["nav", link.key], nav[link.key], { placeholder: link.label })}
+          ></a>
         </li>
       {/each}
     </ul>

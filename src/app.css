@@ -51,7 +51,7 @@
  */
 @font-face {
   font-family: "Jua Extras";
-  src: url("/fonts/jua-extras.woff2") format("woff2");
+  src: url("./lib/assets/jua-extras.woff2") format("woff2");
   font-display: swap;
   unicode-range:
     U+60, U+A1-AC, U+AE-17E, U+18F, U+192, U+1CD-1CE, U+1D4, U+218-21B, U+237,

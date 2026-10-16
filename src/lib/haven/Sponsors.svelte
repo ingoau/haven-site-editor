@@ -1,15 +1,16 @@
 <script lang="ts">
-  import { defaultSiteData } from "$lib/data/site";
   import type { SiteImages } from "$lib/data/images";
   import type { Sponsor } from "$lib/data/types";
+  import AddChip from "$lib/preview/AddChip.svelte";
+  import { asset, item, preview, text } from "$lib/preview/edit.svelte";
 
   interface Props {
     heading: string;
     items: Sponsor[];
-    images?: SiteImages;
+    images: SiteImages;
   }
 
-  let { heading, items, images = defaultSiteData.images }: Props = $props();
+  let { heading, items, images }: Props = $props();
 
   const ROW_SIZE = 3;
 
@@ -40,8 +41,22 @@
   ];
 </script>
 
-{#if items.length > 0}
-  <section class="relative z-10 bg-haven-green overflow-x-clip">
+{#if items.length === 0}
+  {#if preview.showHidden}
+    <section
+      data-section="sponsors"
+      class="ed-hidden-on-site relative z-10 mx-auto my-[clamp(3rem,6vw,6rem)] flex w-[min(90%,40rem)] flex-col items-center gap-4 rounded-[2rem] bg-haven-brown-dark/80 px-6 py-10 text-center"
+      data-hidden-note="Hidden until you add a sponsor"
+    >
+      <h2
+        class="font-display text-[clamp(1.5rem,4vw,3rem)] text-white"
+        {@attach text(["sponsors", "heading"], heading, { placeholder: "Heading" })}
+      ></h2>
+      <AddChip list={["sponsors", "items"]} kind="sponsor" label="Add a sponsor" class="ed-add-light" />
+    </section>
+  {/if}
+{:else}
+  <section data-section="sponsors" class="relative z-10 bg-haven-green overflow-x-clip">
     <img
       src={images.sponsorsEdgeTop}
       alt=""
@@ -178,9 +193,8 @@
       <div class="shell relative">
         <h2
           class="absolute inset-x-0 text-center z-25 font-display text-[clamp(1.5rem,6vw,3rem)] sm:text-display text-white translate-y-[clamp(2rem,4vw,4rem)] sm:translate-y-[clamp(2rem,6vw,4rem)] md:translate-y-[clamp(3rem,8vw,8rem)]"
-        >
-          {heading}
-        </h2>
+          {@attach text(["sponsors", "heading"], heading, { placeholder: "Heading" })}
+        ></h2>
 
         {#each rows as row, rowIndex}
           <div
@@ -222,37 +236,34 @@
             <ul
               class="relative flex items-start z-10 gap-[clamp(0rem,8vw,5rem)] pt-[clamp(3rem,14vw,12rem)] sm:pt-[clamp(3rem,8vw,8rem)] md:pt-[clamp(2rem,10vw+100/vw,8rem)] px-[clamp(2rem,15vw,15rem)]"
             >
-              {#each row as item, itemIndex (itemIndex)}
+              {#each row as sponsor, itemIndex (itemIndex)}
                 <li
                   class={[
                     "relative w-full flex flex-col items-center z-20 text-center translate-y-[clamp(0rem,vw,2rem)] ",
                     sponsorRowPadding[rowIndex],
                   ]}
+                  {@attach item(["sponsors", "items"], rowIndex * ROW_SIZE + itemIndex, { kind: "sponsor", axis: "x", label: "Sponsor" })}
                 >
-                  <a
-                    href={item.href}
-                    target="_blank"
-                    rel="noopener"
-                    class="block w-full transition-transform hover:scale-[1.02] active:scale-100"
-                  >
+                  <div class="block w-full">
                     <img
-                      src={item.image}
-                      alt={item.name}
-                      loading="lazy"
+                      src={asset(sponsor.image)}
+                      alt={sponsor.name}
                       decoding="async"
                       class="relative mx-auto h-[clamp(2rem,10vw,8rem)] z-20 w-full max-w-32 object-contain"
                     />
                     <p
                       class="text-white md:text-[clamp(0.5rem,2vw,2rem)] md:leading-[1.05] md:pt-[clamp(0.5rem,1.2vw,1.2rem)]"
-                    >
-                      {item.name}
-                    </p>
-                  </a>
+                      {@attach text(["sponsors", "items", rowIndex * ROW_SIZE + itemIndex, "name"], sponsor.name, { placeholder: "Sponsor name" })}
+                    ></p>
+                  </div>
                 </li>
               {/each}
             </ul>
           </div>
         {/each}
+        <div class="ed-only relative z-30 flex justify-center pt-[clamp(4rem,8vw,8rem)]">
+          <AddChip list={["sponsors", "items"]} kind="sponsor" label="Add a sponsor" length={items.length} class="ed-add-light" />
+        </div>
       </div>
     </div>
   </section>

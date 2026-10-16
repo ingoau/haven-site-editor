@@ -1,0 +1,236 @@
+/*
+ * Editing affordances drawn over the Haven page. They use outlines and
+ * pseudo-elements only, so nothing here moves the page's own layout.
+ */
+
+:root {
+  --ed-accent: #1f6fff;
+  --ed-ink: #18210a;
+  --ed-hover: rgb(31 111 255 / 0.55);
+}
+
+[data-editable] {
+  cursor: text;
+  outline: 1.5px dashed transparent;
+  outline-offset: 3px;
+  border-radius: 4px;
+  transition: outline-color 120ms;
+  min-width: 1ch;
+}
+
+[data-editable]:hover {
+  outline-color: var(--ed-hover);
+}
+
+[data-editable]:focus {
+  outline: 2px solid var(--ed-accent);
+  outline-offset: 3px;
+  caret-color: currentColor;
+}
+
+[data-editable]:empty::before {
+  content: attr(data-placeholder);
+  opacity: 0.55;
+  font-style: italic;
+}
+
+.marker[data-editable]:focus {
+  outline-offset: 1px;
+}
+
+[data-pick] {
+  cursor: pointer;
+}
+
+[data-pick]:hover:not(:has([data-pick]:hover)) {
+  outline: 1.5px solid var(--ed-hover);
+  outline-offset: 4px;
+}
+
+.ed-selected,
+.ed-selected:hover {
+  outline: 2.5px solid var(--ed-accent) !important;
+  outline-offset: 4px;
+}
+
+/* Item toolbar: grip, label, duplicate, delete. */
+.ed-tools {
+  position: absolute;
+  z-index: 60;
+  top: 4px;
+  left: 4px;
+  display: none;
+  align-items: center;
+  gap: 1px;
+  padding: 2px;
+  border-radius: 8px;
+  background: var(--ed-ink);
+  color: #fff;
+  font: 600 11px/1 "Atkinson Hyperlegible", system-ui, sans-serif;
+  letter-spacing: 0;
+  text-shadow: none;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.3);
+  rotate: 0deg;
+  white-space: nowrap;
+}
+
+[data-ed-item="outside"] > .ed-tools {
+  top: 50%;
+  left: auto;
+  right: 100%;
+  translate: -6px -50%;
+}
+
+[data-ed-item]:hover:not(:has([data-ed-item]:hover)) > .ed-tools,
+.ed-selected > .ed-tools {
+  display: flex;
+}
+
+.ed-is-dragging .ed-tools {
+  display: none !important;
+}
+
+.ed-tools button {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 22px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+.ed-tools button:hover {
+  background: rgb(255 255 255 / 0.18);
+}
+
+.ed-tools .ed-grip {
+  cursor: grab;
+}
+
+.ed-tools .ed-danger:hover {
+  background: #d93a2b;
+}
+
+.ed-tools-name {
+  padding: 0 6px 0 2px;
+  opacity: 0.8;
+}
+
+.ed-tools-name:empty {
+  display: none;
+}
+
+.ed-dragging {
+  opacity: 0.4;
+}
+
+/* Drop indicators: a thick bar on the side the item will land. */
+[data-drop] {
+  outline: 2px dashed var(--ed-accent) !important;
+  outline-offset: 4px;
+}
+
+[data-drop]::after {
+  content: "";
+  position: absolute;
+  z-index: 70;
+  background: var(--ed-accent);
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+[data-drop="before-y"]::after {
+  inset: -9px 0 auto 0;
+  height: 4px;
+}
+
+[data-drop="after-y"]::after {
+  inset: auto 0 -9px 0;
+  height: 4px;
+}
+
+[data-drop="before-x"]::after {
+  inset: 0 auto 0 -9px;
+  width: 4px;
+}
+
+[data-drop="after-x"]::after {
+  inset: 0 -9px 0 auto;
+  width: 4px;
+}
+
+[data-drop-zone] {
+  outline: 2px dashed var(--ed-accent) !important;
+  background: rgb(31 111 255 / 0.15) !important;
+}
+
+/* "Add …" buttons only exist in the editor. */
+.ed-add {
+  position: relative;
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 6px 12px 6px 9px;
+  border: 1.5px dashed rgb(24 33 10 / 0.5);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.75);
+  color: var(--ed-ink);
+  font: 600 13px/1 "Atkinson Hyperlegible", system-ui, sans-serif;
+  letter-spacing: 0;
+  text-shadow: none;
+  cursor: pointer;
+  pointer-events: auto;
+  white-space: nowrap;
+  rotate: 0deg;
+}
+
+.ed-add:hover {
+  border-style: solid;
+  border-color: var(--ed-accent);
+  color: var(--ed-accent);
+  background: #fff;
+}
+
+.ed-add-light {
+  background: rgb(255 255 255 / 0.85);
+}
+
+/* Things the live page hides, shown faded with a note. */
+.ed-hidden-on-site {
+  position: relative;
+  opacity: 0.72;
+  outline: 2px dashed rgb(255 255 255 / 0.7);
+  outline-offset: 6px;
+}
+
+.ed-hidden-on-site::before {
+  content: attr(data-hidden-note);
+  position: absolute;
+  z-index: 50;
+  top: -12px;
+  left: 50%;
+  translate: -50% -100%;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--ed-ink);
+  color: #fff;
+  font: 600 11px/1.2 "Atkinson Hyperlegible", system-ui, sans-serif;
+  letter-spacing: 0;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Stands in for the live MapLibre map. */
+.map-stand-in {
+  background:
+    radial-gradient(circle at 30% 40%, #9bd3c0 0 18%, transparent 19%),
+    radial-gradient(circle at 70% 55%, #9bd3c0 0 22%, transparent 23%),
+    radial-gradient(circle at 50% 20%, #9bd3c0 0 12%, transparent 13%),
+    #6fb3d6;
+}
