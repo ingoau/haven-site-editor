@@ -62,6 +62,6 @@ npm run build   # static site in build/
 ```
 
 Pushing to `main` deploys to GitHub Pages through
-`.github/workflows/deploy.yml`, built under `/<repo-name>`. If the first run
-can't enable Pages on its own, turn it on under Settings → Pages → Source:
-GitHub Actions.
+`.github/workflows/deploy.yml`, built under `/<repo-name>`. Pages has to be
+switched on once under Settings → Pages → Source: GitHub Actions; the workflow
+can't do that itself.
