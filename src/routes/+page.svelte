@@ -16,9 +16,24 @@
   let formEl: HTMLElement | undefined = $state();
   let dropping = $state(false);
   let now = $state(Date.now());
+  let notice: HTMLDialogElement | undefined = $state();
+
+  const NOTICE_KEY = "haven-editor:unofficial-notice";
+  const HELP_URL = "https://hackclub.enterprise.slack.com/team/U0923H02Y3B";
+
+  function dismissNotice() {
+    try {
+      localStorage.setItem(NOTICE_KEY, "1");
+    } catch {}
+  }
 
   onMount(() => {
     editor.init();
+    try {
+      if (!localStorage.getItem(NOTICE_KEY)) notice?.showModal();
+    } catch {
+      notice?.showModal();
+    }
     const tick = setInterval(() => (now = Date.now()), 15000);
     return () => clearInterval(tick);
   });
@@ -278,6 +293,17 @@
   {#if dropping}
     <div class="dropping" aria-hidden="true">Drop a .json file to import it</div>
   {/if}
+
+  <dialog class="notice" bind:this={notice} aria-labelledby="notice-title" onclose={dismissNotice}>
+    <h2 id="notice-title">This editor is unofficial</h2>
+    <p>
+      It isn't made or supported by Hack Club or the Haven organisers. If you need help with it, message
+      <a href={HELP_URL} target="_blank" rel="noopener">@inw on the Hack Club Slack</a>, not the Haven orgs team.
+    </p>
+    <form method="dialog">
+      <button class="btn btn-primary">Got it</button>
+    </form>
+  </dialog>
 
   <div class="toast" class:toast-show={toastVisible} class:toast-bad={toast.tone === "bad"} role="status" aria-live="polite">
     {toast.message}
