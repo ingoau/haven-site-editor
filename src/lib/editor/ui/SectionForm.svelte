@@ -102,7 +102,23 @@
     placeholder="en"
     hint="Optional two-letter code, like fi, to open the sign-up form in that language."
   />
-  <Field path={["hero", "organizeCta"]} label="Organizer link" />
+  <Field
+    path={["hero", "contact"]}
+    label="Contact link"
+    hint="The words before your city's email address (your page's name @haven.hackclub.com), under the sign-up box."
+  />
+  <Field
+    path={["hero", "venueTbd"]}
+    label="Venue not yet approved"
+    hint="Shown until your venue is approved in Airtable; then the page shows the venue's name instead. Leave the venue out of the tagline."
+  />
+  <Field
+    path={["hero", "venueLink"]}
+    label="Venue link (optional)"
+    kind="url"
+    placeholder="https://maps.google.com/?q=…"
+    hint="Where the venue's name links to, instead of a map search for its address. Ignored until your venue is approved."
+  />
   <Field path={["hero", "mapLabel"]} label="Map label" />
   <Field path={["hero", "scrollLabel"]} label="Scroll arrow label" />
 {:else if section === "about"}

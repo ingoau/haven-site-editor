@@ -170,6 +170,25 @@ const fontSchema = z
     typeof value === "string" ? { family: value } : value,
   );
 
+/** A synced row of the Airtable Events table. */
+export interface HavenEvent {
+  id: string;
+  slug: string;
+  name: string;
+  latitude: number;
+  longitude: number;
+  /** The city page's copy, as the JSON string Airtable stores it in. */
+  websiteData: string | null;
+  /** Null until a venue is approved; undefined when it is private, which hides
+   * the venue line altogether. */
+  venue?: EventVenue | null;
+}
+
+export interface EventVenue {
+  name: string;
+  address: string | null;
+}
+
 export interface SiteData {
   /** Labels only; where each link goes is fixed. */
   nav: Record<NavKey, string>;
@@ -178,9 +197,19 @@ export interface SiteData {
   title: string[];
   tagline: string[];
   hero: {
-    organizeCta: string;
     mapLabel: string;
     scrollLabel: string;
+    /** The words before `contactEmail` in the link under the signup box; city
+     * pages only. */
+    contact?: string;
+    /** From the event's slug, not the copy; city pages only. */
+    contactEmail?: string;
+    /** From the event, not the copy. Omitted on pages without a venue line;
+     * null shows `venueTbd`. */
+    venue?: EventVenue | null;
+    venueTbd: string;
+    /** Where the venue line links instead of a map search for its address. */
+    venueLink?: string;
     signup: { placeholder: string; button: string; lang?: string };
   };
   about: { title: string; body: string; perks: Perk[] };
@@ -236,9 +265,14 @@ export const siteDataInputSchema = z.object({
   tagline: z.string().array().optional(),
   hero: z
     .object({
-      organizeCta: z.string().optional(),
       mapLabel: z.string().optional(),
       scrollLabel: z.string().optional(),
+      contact: z.string().optional(),
+      venueTbd: z.string().optional(),
+      /** Opens in a new tab, so only a web address makes sense. */
+      venueLink: hrefSchema
+        .regex(/^https?:\/\//i, "must be an http(s) link")
+        .optional(),
       signup: z
         .object({
           placeholder: z.string().optional(),

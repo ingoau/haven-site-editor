@@ -40,7 +40,9 @@ The page sections, default copy, artwork and schema are copied from
 with the same components and the same validation as the live site. The
 section components in `src/lib/haven/` are Haven's with editing hooks added.
 The live map in the hero is replaced by a stand-in, since it needs Haven's
-servers.
+servers. The venue line always shows its "not approved yet" text, and the
+contact address is guessed from the city name, since both really come from the
+event's Airtable row.
 
 - `src/routes/+page.svelte`: the editor
 - `src/routes/preview/`: the page preview, loaded in a frame so its

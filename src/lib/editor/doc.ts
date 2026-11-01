@@ -2,6 +2,7 @@ import { resolveSiteData } from "$lib/data/site";
 import {
   siteDataInputSchema,
   siteDataJsonSchema,
+  type HavenEvent,
   type SiteData,
   type SiteDataInput,
 } from "$lib/data/types";
@@ -12,12 +13,17 @@ export type Path = (string | number)[];
 
 /**
  * Everything a city page renders, fully filled in, so every field has a value
- * the editor can show. `meta.title` and `hero.signup.lang` use "" for "not set"
- * because they have no default text of their own.
+ * the editor can show. `meta.title`, `hero.venueLink` and `hero.signup.lang`
+ * use "" for "not set" because they have no default text of their own.
+ *
+ * The hero's venue and contact address come from the event's Airtable row,
+ * not the copy, so they are left out here.
  */
 export type EditorDoc = Omit<SiteData, "title" | "meta" | "hero" | "fonts"> & {
   meta: { title: string; description: string; image: string };
-  hero: Omit<SiteData["hero"], "signup"> & {
+  hero: Omit<SiteData["hero"], "signup" | "contact" | "contactEmail" | "venue" | "venueLink"> & {
+    contact: string;
+    venueLink: string;
     signup: { placeholder: string; button: string; lang: string };
   };
   fonts: Record<"display" | "body", FontSpec>;
@@ -26,19 +32,32 @@ export type EditorDoc = Omit<SiteData, "title" | "meta" | "hero" | "fonts"> & {
 const clone = <T>(value: T): T => structuredClone(value);
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
 
+/** The editor has no Airtable row; only the copy matters here. */
+const noEvent: HavenEvent = {
+  id: "",
+  slug: "",
+  name: "",
+  latitude: 0,
+  longitude: 0,
+  websiteData: null,
+};
+
 /** What a city page shows when its JSON is `{}`. */
 export function cityDefaults(): EditorDoc {
-  return fromSiteData(resolveSiteData({}, { name: "" }));
+  return fromSiteData(resolveSiteData({}, noEvent));
 }
 
 function fromSiteData(site: SiteData): EditorDoc {
   const { title: _title, ...rest } = clone(site);
+  const { contactEmail: _email, venue: _venue, ...hero } = rest.hero;
   return {
     ...rest,
     meta: { ...rest.meta, title: rest.meta.title ?? "" },
     hero: {
-      ...rest.hero,
-      signup: { ...rest.hero.signup, lang: rest.hero.signup.lang ?? "" },
+      ...hero,
+      contact: hero.contact ?? "",
+      venueLink: hero.venueLink ?? "",
+      signup: { ...hero.signup, lang: hero.signup.lang ?? "" },
     },
     fonts: {
       display: rest.fonts.display ?? { family: "", src: "" },
@@ -48,7 +67,7 @@ function fromSiteData(site: SiteData): EditorDoc {
 }
 
 export function fromInput(input: SiteDataInput): EditorDoc {
-  return fromSiteData(resolveSiteData(input, { name: "" }));
+  return fromSiteData(resolveSiteData(input, noEvent));
 }
 
 /** Drop optional keys left blank, so `"href": ""` never reaches the form. */
@@ -106,9 +125,10 @@ export function toInput(doc: EditorDoc): Record<string, unknown> {
   if (!same(doc.tagline, base.tagline)) out.tagline = doc.tagline;
 
   const hero: Record<string, unknown> = {};
-  for (const f of ["organizeCta", "mapLabel", "scrollLabel"] as const) {
+  for (const f of ["contact", "venueTbd", "mapLabel", "scrollLabel"] as const) {
     if (doc.hero[f] !== base.hero[f]) hero[f] = doc.hero[f];
   }
+  if (doc.hero.venueLink.trim()) hero.venueLink = doc.hero.venueLink.trim();
   const signup: Record<string, string> = {};
   if (doc.hero.signup.placeholder !== base.hero.signup.placeholder)
     signup.placeholder = doc.hero.signup.placeholder;

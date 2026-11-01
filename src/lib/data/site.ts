@@ -1,6 +1,7 @@
-type HavenEvent = { name: string };
 import {
   about,
+  cityContactLabel,
+  cityEmail,
   event,
   faqCta,
   faqHeading,
@@ -10,7 +11,6 @@ import {
   heroCopy,
   meta,
   navLinks,
-  organizeCta,
   pastEvents,
   pastEventsHeading,
   pastEventsSafety,
@@ -28,7 +28,7 @@ import {
   supportersHeading,
 } from "./content";
 import { imageDefaults, type SiteImages } from "./images";
-import type { SiteData, SiteDataInput } from "./types";
+import type { HavenEvent, SiteData, SiteDataInput } from "./types";
 
 /**
  * Everything the page renders when nothing has been written for it — what the
@@ -42,9 +42,9 @@ export const defaultSiteData: SiteData = {
   title: [...event.title],
   tagline: [...event.tagline],
   hero: {
-    organizeCta: organizeCta.label,
     mapLabel: heroCopy.mapLabel,
     scrollLabel: heroCopy.scrollLabel,
+    venueTbd: heroCopy.venueTbd,
     signup: { ...signupCopy },
   },
   about: { title: about.title, body: about.body, perks },
@@ -106,9 +106,13 @@ export function resolveSiteData(
     title: [event.name],
     tagline: data.tagline ?? base.tagline,
     hero: {
-      organizeCta: data.hero?.organizeCta ?? base.hero.organizeCta,
       mapLabel: data.hero?.mapLabel ?? base.hero.mapLabel,
       scrollLabel: data.hero?.scrollLabel ?? base.hero.scrollLabel,
+      contact: data.hero?.contact ?? cityContactLabel,
+      contactEmail: cityEmail(event.slug),
+      venue: event.venue,
+      venueTbd: data.hero?.venueTbd ?? base.hero.venueTbd,
+      venueLink: data.hero?.venueLink,
       signup: {
         placeholder:
           data.hero?.signup?.placeholder ?? base.hero.signup.placeholder,

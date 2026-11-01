@@ -21,10 +21,6 @@ export const event = {
   tagline: ["Game jam for teens in 200+ cities", "Nov 14–15, 2026"],
 } as const;
 
-export const organizeCta = {
-  label: "Want to organize your own Hack Club Haven?",
-} as const;
-
 export const eventPoc = {
   name: "Haven",
   title: ["Organize a game jam", "in your city!"],
@@ -35,10 +31,17 @@ export const organizeCtaPoc = {
   label: "Want to organize a Hack Club Haven in your city?",
 } as const;
 
+/** The address a city page's contact link emails, named after its slug. */
+export const cityEmail = (slug: string) => `${slug}@haven.hackclub.com`;
+
+/** The words before that address on a city page that has not written its own. */
+export const cityContactLabel = "Contact us:";
+
 /** Copy for the hero that is not the title or the tagline. */
 export const heroCopy = {
   mapLabel: "find an event near you",
   scrollLabel: "more info",
+  venueTbd: "Venue TBD",
 } as const;
 
 export const signupCopy = {
