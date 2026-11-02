@@ -22,11 +22,25 @@ function load(): Saved | null {
     if (!raw) return null;
     const saved = JSON.parse(raw) as Saved;
     if (saved?.version !== 1 || !saved.doc) return null;
-    // Fill in anything a newer default added since this was saved.
-    return { ...saved, doc: { ...cityDefaults(), ...saved.doc } };
+    // Fill in anything a newer default added since this was saved, at any
+    // depth: a new field inside `hero` must not be lost to the saved `hero`.
+    return { ...saved, doc: withDefaults(cityDefaults(), saved.doc) };
   } catch {
     return null;
   }
+}
+
+const isRecord = (v: unknown): v is Record<string, unknown> =>
+  !!v && typeof v === "object" && !Array.isArray(v);
+
+/** `saved` over `defaults`, recursing into objects; lists are taken whole. */
+function withDefaults<T>(defaults: T, saved: unknown): T {
+  if (!isRecord(defaults) || !isRecord(saved)) return (saved ?? defaults) as T;
+  const out: Record<string, unknown> = { ...saved };
+  for (const [key, value] of Object.entries(defaults)) {
+    out[key] = key in saved ? withDefaults(value, saved[key]) : value;
+  }
+  return out as T;
 }
 
 class EditorStore {
