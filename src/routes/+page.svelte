@@ -1,6 +1,6 @@
 <script lang="ts">
   import "$lib/editor/ui/editor.css";
-  import { base } from "$app/paths";
+  import { asset, resolve } from "$app/paths";
   import { onMount, untrack } from "svelte";
   import { editor } from "$lib/editor/store.svelte";
   import { exportJson, importFile, toast, copyJson } from "$lib/editor/actions.svelte";
@@ -140,8 +140,8 @@
 
 <div class="app">
   <header class="bar">
-    <a class="brand" href="{base}/" aria-label="Haven site editor">
-      <img src="{base}/images/logo.webp" alt="" width="778" height="445" />
+    <a class="brand" href={resolve("/")} aria-label="Haven site editor">
+      <img src={asset("images/logo.webp")} alt="" width="778" height="445" />
       <span>site editor</span>
     </a>
 

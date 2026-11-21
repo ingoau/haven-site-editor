@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { base } from "$app/paths";
+  import { resolve } from "$app/paths";
   import type { FromPreview, ToPreview } from "../bridge";
   import { editor } from "../store.svelte";
 
@@ -101,7 +101,7 @@
   >
     <iframe
       bind:this={frame}
-      src="{base}/preview"
+      src={resolve("/preview")}
       title="Preview of your Haven page"
       style="width: {width}px; height: {height}px; zoom: {scale}"
     ></iframe>
