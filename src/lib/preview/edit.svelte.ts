@@ -1,5 +1,6 @@
 import type { Attachment } from "svelte/attachments";
-import { base } from "$app/paths";
+import { asset as staticAsset } from "$app/paths";
+import type { AssetPath } from "$app/types";
 import type { FromPreview } from "$lib/editor/bridge";
 import { cityDefaults, pathKey, type EditorDoc, type Path } from "$lib/editor/doc";
 
@@ -20,7 +21,7 @@ export function post(message: FromPreview) {
 /** Haven's own pictures are `/images/...`; serve them from this site's base. */
 export function asset(src: string | undefined) {
   if (!src) return "";
-  return src.startsWith("/") && !src.startsWith("//") ? `${base}${src}` : src;
+  return src.startsWith("/") && !src.startsWith("//") ? staticAsset(src.slice(1) as AssetPath) : src;
 }
 
 const isSelected = (path: Path) =>

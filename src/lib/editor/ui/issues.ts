@@ -1,4 +1,5 @@
-import { base } from "$app/paths";
+import { asset as staticAsset } from "$app/paths";
+import type { AssetPath } from "$app/types";
 import { pathKey, type Path } from "../doc";
 import { editor } from "../store.svelte";
 
@@ -19,5 +20,5 @@ export function issuesUnder(path: Path): number {
 
 /** Haven's own pictures are `/images/...`; this site serves copies of them. */
 export function assetUrl(src: string) {
-  return src.startsWith("/") && !src.startsWith("//") ? `${base}${src}` : src;
+  return src.startsWith("/") && !src.startsWith("//") ? staticAsset(src.slice(1) as AssetPath) : src;
 }
